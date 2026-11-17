@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: esteban-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: esteban
+      POSTGRES_PASSWORD: yavirac_pass
+      POSTGRES_DB: yavirac_db
+    volumes:
+      - esteban_pgdata:/var/lib/postgresql/data
+    networks:
+      - esteban-red
+
+  web:
+    build: .
+    image: esteban-fullstack-app:v2
+    container_name: esteban-web
+    restart: unless-stopped
+    ports:
+      - "5055:5000"
+    environment:
+      DB_HOST: esteban-db
+      DB_NAME: yavirac_db
+      DB_USER: esteban
+      DB_PASSWORD: yavirac_pass
+    depends_on:
+      - db
+    networks:
+      - esteban-red
+
+volumes:
+  esteban_pgdata:
+
+networks:
+  esteban-red:
+    driver: bridge
